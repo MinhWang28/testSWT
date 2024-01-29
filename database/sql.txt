@@ -1,0 +1,177 @@
+CREATE TABLE Customer (
+    customer_id INT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    phone VARCHAR(20),
+    email VARCHAR(255),
+    street VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    zip_code VARCHAR(20)
+);
+CREATE TABLE Product (
+    product_id INT PRIMARY KEY,
+    model_year INT,
+    product_name VARCHAR(255),
+    brand_name VARCHAR(255),
+    category_name VARCHAR(255),
+    list_price float,
+    quantity INT
+);
+CREATE TABLE Store (
+    store_id INT PRIMARY KEY,
+    store_name VARCHAR(255),
+    phone VARCHAR(20),
+    email VARCHAR(255),
+    street VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    zip_code VARCHAR(20)
+);
+CREATE TABLE Staff (
+    staff_id INT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    store_id INT,
+    manager_id INT
+);
+-- Tạo ràng buộc ngoại cho cột store_id
+ALTER TABLE Staff
+ADD CONSTRAINT FK_Staff_Store
+FOREIGN KEY (store_id)
+REFERENCES Store(store_id);
+
+-- Tạo ràng buộc ngoại cho cột manager_id
+ALTER TABLE Staff
+ADD CONSTRAINT FK_Staff_Manager
+FOREIGN KEY (manager_id)
+REFERENCES Staff(staff_id);
+
+CREATE TABLE StoreProduct (
+    store_id INT,
+    product_id INT,
+    quantity INT,
+    PRIMARY KEY (store_id, product_id),
+    FOREIGN KEY (store_id) REFERENCES Store(store_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+);
+
+CREATE TABLE [Order] (
+    order_id INT,
+    customer_id INT,
+    order_status INT,
+    order_date DATE,
+    required_date DATE,
+    shipped_date DATE,
+    store_id INT,
+    staff_id INT,
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    FOREIGN KEY (store_id) REFERENCES Store(store_id),
+    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id)
+);
+
+CREATE TABLE OrderItem (
+    order_id INT,
+    item_id INT PRIMARY KEY,
+    product_id INT,
+    quantity INT,
+    list_price DECIMAL(10, 2),
+    discount DECIMAL(10, 2),
+    FOREIGN KEY (order_id) REFERENCES [Order](order_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+);
+
+INSERT INTO Store (store_id, store_name, phone, email, street, city, state, zip_code)
+VALUES (1, 'Store A', '1234567890', 'storea@example.com', '123 Main St', 'City A', 'State A', '12345');
+
+INSERT INTO Customer (customer_id, first_name, last_name, phone, email, street, city, state, zip_code)
+VALUES 
+  (1, 'John', 'Doe', '1234567890', 'johndoe@example.com', '123 Main St', 'City A', 'State A', '12345'),
+  (2, 'Jane', 'Smith', '0987654321', 'janesmith@example.com', '456 Elm St', 'City B', 'State B', '54321'),
+  (3, 'Mike', 'Johnson', '1112223333', 'mikejohnson@example.com', '789 Oak St', 'City C', 'State C', '98765'),
+  (4, 'Emily', 'Brown', '5554443333', 'emilybrown@example.com', '321 Maple Ave', 'City D', 'State D', '67890'),
+  (5, 'David', 'Wilson', '7778889999', 'davidwilson@example.com', '555 Pine St', 'City E', 'State E', '13579');
+
+  INSERT INTO Product (product_id, model_year, product_name, brand_name, category_name, list_price, quantity)
+VALUES 
+  (1, 2022, 'Product A', 'Brand A', 'Category A', 99.99, 10),
+  (2, 2021, 'Product B', 'Brand B', 'Category B', 199.99, 5),
+  (3, 2023, 'Product C', 'Brand C', 'Category C', 149.99, 8),
+  (4, 2022, 'Product D', 'Brand D', 'Category A', 79.99, 15),
+  (5, 2023, 'Product E', 'Brand E', 'Category B', 249.99, 3),
+  (6, 2021, 'Product F', 'Brand F', 'Category C', 129.99, 12),
+  (7, 2023, 'Product G', 'Brand G', 'Category A', 109.99, 7),
+  (8, 2022, 'Product H', 'Brand H', 'Category B', 179.99, 9),
+  (9, 2023, 'Product I', 'Brand I', 'Category C', 199.99, 6),
+  (10, 2022, 'Product J', 'Brand J', 'Category A', 149.99, 4);
+
+  INSERT INTO Staff (staff_id, first_name, last_name, email, phone, store_id, manager_id)
+VALUES 
+  (1, 'John', 'Doe', 'johndoe@example.com', '1234567890', 1, NULL),
+  (2, 'Jane', 'Smith', 'janesmith@example.com', '0987654321', 1, 1),
+  (3, 'Mike', 'Johnson', 'mikejohnson@example.com', '1112223333', 1, 2),
+  (4, 'Emily', 'Brown', 'emilybrown@example.com', '5554443333', 1, NULL),
+  (5, 'David', 'Wilson', 'davidwilson@example.com', '7778889999', 1, 3);
+
+  INSERT INTO [Order] (order_id, customer_id, order_status, order_date, required_date, shipped_date, store_id, staff_id)
+VALUES 
+  (1, 1, 1, '2023-10-10', '2023-10-15', '2023-10-12', 1, 1),
+  (2, 2, 1, '2023-10-11', '2023-10-16', '2023-10-13', 1, 2),
+  (3, 3, 2, '2023-10-12', '2023-10-17', NULL, 1, 3),
+  (4, 2, 1, '2023-10-13', '2023-10-18', '2023-10-14', 1, 1),
+  (5, 1, 2, '2023-10-14', '2023-10-19', NULL, 1, 2),
+  (6, 3, 1, '2023-10-15', '2023-10-20', '2023-10-16', 1, 3),
+  (7, 2, 2, '2023-10-16', '2023-10-21', NULL, 1, 1),
+  (8, 1, 1, '2023-10-17', '2023-10-22', '2023-10-18', 1, 2),
+  (9, 3, 1, '2023-10-18', '2023-10-23', '2023-10-19', 1, 3),
+  (10, 2, 2, '2023-10-19', '2023-10-24', NULL, 1, 1);
+
+  INSERT INTO OrderItem (order_id, item_id, product_id, quantity, list_price, discount)
+VALUES 
+  (1, 1, 1, 2, 99.99, 0),
+  (1, 2, 3, 1, 149.99, 0),
+  (1, 3, 5, 3, 249.99, 0),
+  (2, 4, 2, 1, 199.99, 0),
+  (2, 5, 4, 2, 79.99, 0),
+  (2, 6, 6, 1, 129.99, 0),
+  (3, 7, 1, 1, 99.99, 0),
+  (3, 8, 2, 2, 199.99, 0),
+  (3, 9, 4, 3, 79.99, 0),
+  (4, 10, 3, 1, 149.99, 0),
+  (4, 11, 5, 2, 249.99, 0),
+  (4, 12, 6, 1, 129.99, 0),
+  (5, 13, 1, 1, 99.99, 0),
+  (5, 14, 3, 2, 149.99, 0),
+  (5, 15, 4, 3, 79.99, 0),
+  (6, 16, 2, 1, 199.99, 0),
+  (6, 17, 4, 2, 79.99, 0),
+  (6, 18, 6, 1, 129.99, 0),
+  (7, 19, 1, 1, 99.99, 0),
+  (7, 20, 2, 2, 199.99, 0);
+
+INSERT INTO Product (product_id, model_year, product_name, brand_name, category_name, list_price, quantity)
+VALUES
+(11, 2022, 'Product AX', 'Brand A', 'Category A', 99.99, 10),
+(12, 2021, 'Product BY', 'Brand A', 'Category B', 149.99, 5),
+(13, 2023, 'Product CZ', 'Brand B', 'Category C', 199.99, 2),
+(14, 2023, 'Product DX', 'Brand C', 'Category A', 79.99, 8),
+(15, 2022, 'Product EY', 'Brand C', 'Category B', 299.99, 3),
+(16, 2021, 'Product FZ', 'Brand D', 'Category C', 249.99, 6),
+(17, 2023, 'Product GX', 'Brand D', 'Category A', 149.99, 4),
+(18, 2022, 'Product HY', 'Brand D', 'Category B', 199.99, 7);
+
+ALTER TABLE Product
+ADD status INT;
+
+update Product set status = 1;
+
+CREATE TABLE [dbo].[User] (
+    [user_id] INT IDENTITY(1,1) PRIMARY KEY,
+    [user_name] NVARCHAR(50) NOT NULL,
+    [user_email] NVARCHAR(100) NOT NULL,
+    [user_pass] NVARCHAR(50) NOT NULL,
+    [isAdmin] BIT NOT NULL
+);
